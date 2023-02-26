@@ -1,10 +1,11 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, Router } from "express";
 
-const router = express.Router();
+const router = Router();
 
 //Post Method
 router.post("/new", (req: Request, res: Response) => {
-  res.send("Post API");
+  console.log(req.body);
+  res.sendStatus(200);
 });
 
 //Get all Method
@@ -14,7 +15,7 @@ router.get("/getAll", (req: Request, res: Response) => {
 
 //Get by ID Method
 router.get("/getOne/:id", (req: Request, res: Response) => {
-  res.send("Get by ID API");
+  res.send("Get one user");
 });
 
 //Update by ID Method

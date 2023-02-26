@@ -1,20 +1,17 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, Router } from "express";
+import { createNote, getAllNotes } from "../controllers/noteController";
 
-const router = express.Router();
+const router = Router();
 
 //Post Method
-router.post("/new", (req: Request, res: Response) => {
-  res.send("Post API");
-});
+router.post("/new", createNote);
 
 //Get all Method
-router.get("/getAll", (req: Request, res: Response) => {
-  res.send({ text: "hello there!" });
-});
+router.get("/getAll", getAllNotes);
 
 //Get by ID Method
 router.get("/getOne/:id", (req: Request, res: Response) => {
-  res.send("Get by ID API");
+  res.send("Get a single note");
 });
 
 //Update by ID Method

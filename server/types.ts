@@ -1,5 +1,4 @@
 export type User = {
-  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -7,8 +6,7 @@ export type User = {
 };
 
 export type Note = {
-  id: string;
   title: string;
   text: string;
-  pinned: boolean;
+  pinned?: boolean;
 };
