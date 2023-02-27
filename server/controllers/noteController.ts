@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import Note from "../models/noteModel";
 
-export const createNote = async (req: Request, res: Response) => {
-  console.log(req.body);
+const createNote = async (req: Request, res: Response) => {
+  const { title, text } = req.body;
   const note = new Note({
-    title: req.body.title,
-    text: req.body.text,
+    title,
+    text,
   });
 
   try {
@@ -16,10 +16,25 @@ export const createNote = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllNotes = async (req: Request, res: Response) => {
+const getAllNotes = async (req: Request, res: Response) => {
   try {
-    res.send(await Note.find());
+    res.send(await Note.find().sort({ createdAt: -1 }));
   } catch (error) {
     console.log(error);
   }
 };
+
+const deleteNote = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  // console.log(id);
+
+  try {
+    const response = await Note.findByIdAndDelete(id);
+    res.send(response);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { createNote, getAllNotes, deleteNote };

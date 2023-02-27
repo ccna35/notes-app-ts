@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import { Note } from "./types";
 import userRoutes from "./routes/userRoutes";
 import noteRoutes from "./routes/noteRoutes";
-import { createNote } from "./controllers/noteController";
 import mongoose from "mongoose";
 import cors from "cors";
 

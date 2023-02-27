@@ -1,5 +1,9 @@
 import express, { Request, Response, Router } from "express";
-import { createNote, getAllNotes } from "../controllers/noteController";
+import {
+  createNote,
+  deleteNote,
+  getAllNotes,
+} from "../controllers/noteController";
 
 const router = Router();
 
@@ -20,8 +24,6 @@ router.put("/update/:id", (req: Request, res: Response) => {
 });
 
 //Delete by ID Method
-router.delete("/delete/:id", (req: Request, res: Response) => {
-  res.send("Delete by ID API");
-});
+router.delete("/delete/:id", deleteNote);
 
 export default router;

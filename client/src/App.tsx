@@ -13,6 +13,7 @@ import LandingPageLayout from "./Layouts/LandingPageLayout";
 import Privacy from "./pages/Privacy";
 import Tos from "./pages/Tos";
 import NotFoundPage from "./pages/NotFoundPage";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -31,8 +32,14 @@ const router = createBrowserRouter(
   )
 );
 
+const queryClient = new QueryClient();
+
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
 }
 
 export default App;
