@@ -1,12 +1,10 @@
 import express, { Request, Response, Router } from "express";
+import { signUp } from "../controllers/userController";
 
 const router = Router();
 
 //Post Method
-router.post("/new", (req: Request, res: Response) => {
-  console.log(req.body);
-  res.sendStatus(200);
-});
+router.post("/new", signUp);
 
 //Get all Method
 router.get("/getAll", (req: Request, res: Response) => {

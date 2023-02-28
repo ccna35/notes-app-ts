@@ -14,9 +14,6 @@ export default function New() {
   const [title, setTitle] = useState<string>("");
   const [text, setText] = useState<string>("");
 
-  const titleRef = useRef<HTMLInputElement>();
-  const textRef = useRef<HTMLInputElement>();
-
   // const handleTitle = (e: ChangeEvent<HTMLInputElement>) => {
   //   console.log(e.target.value);
   //   setTitle(e.target.value);
@@ -29,42 +26,20 @@ export default function New() {
 
   const navigate = useNavigate();
 
-  const submitNewNote = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    console.log(titleRef.current.value);
-    console.log(textRef.current.value);
-
-    try {
-      const response = await axios.post<NoteType>(
-        "http://localhost:3000/notes/new",
-        {
-          title: titleRef.current.value,
-          text: textRef.current.value,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
-
-      // redirect("/home");
-      // <Navigate to="/home" replace={true} />;
-      console.log(response);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: submitNewNote,
+    mutationFn: (newNote: { title: string; text: string }) => {
+      return axios.post<NoteType>("http://localhost:3000/notes/new", newNote);
+    },
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["notes"] });
+      setTitle("");
+      setText("");
+    },
+    onError: (error: any) => {
+      console.log(error);
     },
   });
 
@@ -72,7 +47,13 @@ export default function New() {
     <div className="mt-10 sm:mt-0 sm:p-8">
       <div className="md:grid md:grid-cols-1 md:gap-6">
         <div className="mt-5 md:col-span-2 md:mt-0">
-          <form method="POST" onSubmit={(e) => submitNewNote(e)}>
+          <form
+            method="POST"
+            onSubmit={(e) => {
+              e.preventDefault();
+              mutation.mutate({ title, text });
+            }}
+          >
             <div className="overflow-hidden shadow sm:rounded-md">
               <div className="bg-white px-4 py-5 sm:p-6">
                 <div className="grid grid-cols-1 gap-6">
@@ -84,17 +65,19 @@ export default function New() {
                       required
                       placeholder="Note title..."
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      ref={titleRef}
+                      onChange={(e) => setTitle(e.target.value)}
+                      value={title}
                     />
                   </div>
                   <div className="col-span-6 sm:col-span-3">
                     <textarea
                       id="noteText"
                       name="noteText"
-                      rows={15}
+                      rows={10}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       placeholder="Write your note here..."
-                      ref={textRef}
+                      onChange={(e) => setText(e.target.value)}
+                      value={text}
                     />
                   </div>
                 </div>
@@ -102,9 +85,10 @@ export default function New() {
               <div className="bg-gray-50 px-4 py-3 sm:px-6">
                 <button
                   type="submit"
-                  className="text-left inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  disabled={mutation.isLoading}
                 >
-                  Add New Note
+                  {mutation.isLoading ? "Loading..." : "Add New Note"}
                 </button>
               </div>
             </div>

@@ -15,28 +15,15 @@ export type NoteType = {
 };
 
 export default function Home() {
-  // const [notes, setNotes] = useState<NoteType[]>([]);
-
-  // const [loading, setLoading] = useState<boolean>(true);
-
   const getNotes = async (): Promise<NoteType[]> => {
     try {
       const response = await axios.get("http://localhost:3000/notes/getAll");
       return response.data;
-      // setLoading(false);
-      // setNotes([...notes, ...response.data]);
     } catch (error: any) {
       console.error(error);
       return error;
     }
   };
-
-  // useEffect(() => {
-  //   getNotes();
-  //   // return () => {
-  //   //   second;
-  //   // };
-  // }, []);
 
   // Access the client
   const queryClient = useQueryClient();
@@ -49,28 +36,41 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex justify-center items-center">
+      <div className="flex justify-center items-center">
         <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="p-4">
-      <h1 className="mb-8 text-4xl">This is the homepage</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {data?.map((note: any) => (
-          <Note
-            key={note._id}
-            title={note.title}
-            text={note.text}
-            _id={note._id}
-            pinned={note.pinned}
-            createdAt={note.createdAt}
-            updatedAt={note.updatedAt}
+    <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 flex-grow">
+      <h1 className="my-8 text-xl text-center gray-800 p-4 bg-yellow-200 border border-yellow-300 shadow-sm rounded-sm">
+        Good morning, start your day by creating a new note!
+      </h1>
+      {data?.length === 0 ? (
+        <div className="text-2xl text-center flex gap-4 items-center justify-center">
+          <p>Oops! looks like you haven't created any notes yet.</p>
+          <img
+            src="../sad-but-relieved-face-svgrepo-com.svg"
+            alt=""
+            className="h-8 w-auto"
           />
-        ))}
-      </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {data?.map((note: any) => (
+            <Note
+              key={note._id}
+              title={note.title}
+              text={note.text}
+              _id={note._id}
+              pinned={note.pinned}
+              createdAt={note.createdAt}
+              updatedAt={note.updatedAt}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

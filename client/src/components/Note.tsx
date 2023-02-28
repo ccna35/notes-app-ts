@@ -1,7 +1,9 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import dayjs from "dayjs";
 import { ErrorInfo, FC, FunctionComponent } from "react";
 import { NoteType } from "../pages/Home";
+import { motion } from "framer-motion";
 
 const Note: FunctionComponent<NoteType> = (note) => {
   const newDate = dayjs(note.createdAt).format("ddd MMM YYYY h:m A");
@@ -17,10 +19,35 @@ const Note: FunctionComponent<NoteType> = (note) => {
     }
   };
 
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (id: string | undefined) => {
+      return axios.delete(`http://localhost:3000/notes/delete/${id}`);
+    },
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+    onError: (error: any) => {
+      console.log(error);
+    },
+  });
+
   return (
-    <div className="p-5 flex flex-col justify-between overflow-hidden rounded-md bg-white shadow-sm duration-500 hover:shadow-lg border">
+    <motion.div
+      className="p-5 flex flex-col gap-4 self-start justify-between overflow-hidden rounded-md bg-white shadow-sm duration-500 hover:shadow-md border hover:border-gray-400"
+      layout
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <h2 className="text-lg font-medium">{note.title}</h2>
+      <p className="text-gray-700 text-lg self-start">{note.text}</p>
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl">{note.title}</h2>
+        <p className="text-sm p-2 rounded-sm bg-slate-200 self-start">
+          {newDate}
+        </p>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -28,7 +55,9 @@ const Note: FunctionComponent<NoteType> = (note) => {
           strokeWidth={1.5}
           stroke="currentColor"
           className="w-6 h-6 cursor-pointer hover:text-red-600 transition"
-          onClick={() => handleDelete(note._id)}
+          onClick={() => {
+            mutation.mutate(note._id);
+          }}
         >
           <path
             strokeLinecap="round"
@@ -37,11 +66,7 @@ const Note: FunctionComponent<NoteType> = (note) => {
           />
         </svg>
       </div>
-      <p className="text-gray-700 text-lg self-start">{note.text}</p>
-      <p className="text-sm p-2 rounded-sm bg-slate-200 self-start">
-        {newDate}
-      </p>
-    </div>
+    </motion.div>
   );
 };
 

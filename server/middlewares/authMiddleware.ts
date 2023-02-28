@@ -8,45 +8,6 @@ dotenv.config();
 
 const SECRET_KEY: Secret | undefined = process.env.MY_SECRET;
 
-// Handling post request
-const signUp = async (req: Request, res: Response, next: NextFunction) => {
-  const { firstName, lastName, name, email, password } = req.body;
-
-  const hashedPassword: string = await bcrypt.hash(password, 10);
-
-  const newUser = new User({
-    firstName,
-    lastName,
-    name,
-    email,
-    password: hashedPassword,
-  });
-
-  try {
-    await newUser.save();
-  } catch {
-    const error = new Error("Error! Something went wrong.");
-    return next(error);
-  }
-  let token;
-  try {
-    token = jwt.sign({ newUser }, SECRET_KEY as string, {
-      expiresIn: "1h",
-    });
-
-    res.cookie("token", token, {
-      httpOnly: true,
-    });
-  } catch (err) {
-    const error = new Error("Error! Something went wrong.");
-    return next(error);
-  }
-  res.status(201).json({
-    success: true,
-    data: { userId: newUser.id, email: newUser.email, token: token },
-  });
-};
-
 // handles login process
 const login = async (req: Request, res: Response, next: NextFunction) => {
   let { email, password } = req.body;
@@ -85,3 +46,5 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     },
   });
 };
+
+export { login };
