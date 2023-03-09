@@ -20,20 +20,8 @@ app.use(
 );
 app.use(express.json());
 
-const notes: Note[] = [];
-
 app.use("/users", userRoutes);
 app.use("/notes", noteRoutes);
-
-// app.get("/notes", (req: Request, res: Response) => {
-//   res.send(notes);
-// });
-
-// app.post("/notes", (req: Request, res: Response) => {
-//   console.log(req.body);
-//   notes.push(req.body);
-//   res.sendStatus(200);
-// });
 
 const DB_URI: string | undefined = process.env.DB_URI;
 
@@ -47,5 +35,3 @@ mongoose
     });
   })
   .catch((err) => console.log(err.message));
-
-// console.log(typeof process.env.DB_URI);

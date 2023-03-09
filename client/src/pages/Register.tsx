@@ -1,14 +1,24 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 import { NoteType } from "./Home";
 
 export type UserType = {
-  firstName: string;
-  lastName: string;
+  data?: {
+    token: string;
+    userData: {
+      id: string;
+      email: string;
+    };
+  };
+  firstName?: string;
+  lastName?: string;
   email: string;
   password: string;
-  secondPassword: string;
+  secondPassword?: string;
+  token?: string;
 };
 
 export default function Register() {
@@ -18,13 +28,11 @@ export default function Register() {
   const [password, setPassword] = useState<string>("");
   const [secondPassword, setSecondPassword] = useState<string>("");
 
-  const queryClient = useQueryClient();
+  const [_, setCookies] = useCookies(["access_token"]);
 
-  const addUser = (newUser: UserType) => {
-    if (password === secondPassword) {
-      return axios.post<UserType>("http://localhost:3000/users/new", newUser);
-    }
-  };
+  const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: (newUser: UserType) => {
@@ -33,7 +41,18 @@ export default function Register() {
     onSuccess: (data) => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      console.log(data);
+      setCookies("access_token", data.data.data?.token);
+      localStorage.setItem(
+        "userData",
+        JSON.stringify(data.data.data?.userData)
+      );
+      console.log(data.data.data);
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPassword("");
+      setSecondPassword("");
+      navigate("/home");
     },
     onError: (error: any) => {
       console.log(error);
@@ -85,6 +104,7 @@ export default function Register() {
                       autoComplete="given-name"
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       onChange={(e) => setFirstName(e.target.value)}
+                      value={firstName}
                     />
                   </div>
 
@@ -103,6 +123,7 @@ export default function Register() {
                       autoComplete="family-name"
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       onChange={(e) => setLastName(e.target.value)}
+                      value={lastName}
                     />
                   </div>
 
@@ -121,6 +142,7 @@ export default function Register() {
                       autoComplete="email"
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       onChange={(e) => setEmail(e.target.value)}
+                      value={email}
                     />
                   </div>
 
@@ -139,6 +161,7 @@ export default function Register() {
                       required
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       onChange={(e) => setPassword(e.target.value)}
+                      value={password}
                     />
                   </div>
 
@@ -157,6 +180,7 @@ export default function Register() {
                       required
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       onChange={(e) => setSecondPassword(e.target.value)}
+                      value={secondPassword}
                     />
                   </div>
                 </div>
@@ -165,8 +189,9 @@ export default function Register() {
                 <button
                   type="submit"
                   className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  disabled={mutation.isLoading}
                 >
-                  Save
+                  {mutation.isLoading ? "Loading..." : "Sign up"}
                 </button>
               </div>
             </div>

@@ -1,10 +1,13 @@
 import express, { Request, Response, Router } from "express";
-import { signUp } from "../controllers/userController";
+import { login, signUp } from "../controllers/userController";
 
 const router = Router();
 
 //Post Method
 router.post("/new", signUp);
+
+// Handles user login
+router.post("/login", login);
 
 //Get all Method
 router.get("/getAll", (req: Request, res: Response) => {

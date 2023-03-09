@@ -14,15 +14,18 @@ import Privacy from "./pages/Privacy";
 import Tos from "./pages/Tos";
 import NotFoundPage from "./pages/NotFoundPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route errorElement={<NotFoundPage />}>
       <Route element={<RootLayout />}>
-        <Route path="home" element={<Home />} />
+        <Route element={<ProtectedRoutes />}>
+          <Route path="home" element={<Home />} />
+          <Route path="new" element={<New />} />
+        </Route>
         <Route path="register" element={<Register />} />
         <Route path="login" element={<Login />} />
-        <Route path="new" element={<New />} />
       </Route>
       <Route path="/" element={<LandingPageLayout />}>
         <Route path="/privacy" element={<Privacy />} />

@@ -42,8 +42,10 @@ const Note: FunctionComponent<NoteType> = (note) => {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <h2 className="text-lg font-medium">{note.title}</h2>
-      <p className="text-gray-700 text-lg self-start">{note.text}</p>
+      <h2 className="text-lg font-medium w-11/12 truncate">{note.title}</h2>
+      <p className="text-gray-700 text-lg self-start w-11/12 truncate">
+        {note.text}
+      </p>
       <div className="flex justify-between items-center">
         <p className="text-sm p-2 rounded-sm bg-slate-200 self-start">
           {newDate}

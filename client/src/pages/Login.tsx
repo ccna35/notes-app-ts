@@ -1,7 +1,42 @@
+import { useState } from "react";
 import { LockClosedIcon } from "@heroicons/react/20/solid";
-import { Link } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import useCookies from "react-cookie/cjs/useCookies";
+import { Link, useNavigate } from "react-router-dom";
+import { UserType } from "./Register";
 
 export default function Login() {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const [_, setCookies] = useCookies(["access_token"]);
+
+  const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: (newUser: UserType) => {
+      return axios.post<UserType>("http://localhost:3000/users/login", newUser);
+    },
+    onSuccess: (data) => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setCookies("access_token", data.data.data?.token);
+      localStorage.setItem(
+        "userData",
+        JSON.stringify(data.data.data?.userData)
+      );
+      setEmail("");
+      setPassword("");
+      navigate("/home");
+    },
+    onError: (error: any) => {
+      console.log(error);
+    },
+  });
+
   return (
     <>
       <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -25,7 +60,18 @@ export default function Login() {
               </Link>
             </p>
           </div>
-          <form className="mt-8 space-y-6" action="#" method="POST">
+          <form
+            className="mt-8 space-y-6"
+            method="POST"
+            onSubmit={(e) => {
+              e.preventDefault();
+              mutation.mutate({
+                email,
+                password,
+              });
+            }}
+            // onSubmit={(e) => handleSubmit(e)}
+          >
             <input type="hidden" name="remember" defaultValue="true" />
             <div className="-space-y-px rounded-md shadow-sm">
               <div>
@@ -40,6 +86,8 @@ export default function Login() {
                   required
                   className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                   placeholder="Email address"
+                  onChange={(e) => setEmail(e.target.value)}
+                  value={email}
                 />
               </div>
               <div>
@@ -54,6 +102,8 @@ export default function Login() {
                   required
                   className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                   placeholder="Password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  value={password}
                 />
               </div>
             </div>
@@ -88,6 +138,7 @@ export default function Login() {
               <button
                 type="submit"
                 className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                disabled={mutation.isLoading}
               >
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                   <LockClosedIcon
@@ -95,7 +146,7 @@ export default function Login() {
                     aria-hidden="true"
                   />
                 </span>
-                Sign in
+                {mutation.isLoading ? "Loading..." : "Sign in"}
               </button>
             </div>
           </form>

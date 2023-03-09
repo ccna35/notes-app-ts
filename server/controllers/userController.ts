@@ -3,8 +3,6 @@ import jwt, { Secret } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import User from "../models/userModel";
-import { serialize } from "v8";
-import cookie from "cookie";
 
 dotenv.config();
 
@@ -28,26 +26,19 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
       await newUser.save();
-      let token;
-
-      token = jwt.sign({ newUser }, SECRET_KEY as string, {
+      let token = jwt.sign({ newUser }, SECRET_KEY as string, {
         expiresIn: "1h",
       });
 
-      console.log(token);
-
-      res.cookie("access_token", "Bearer " + token, {
-        httpOnly: true,
-      });
-
-      //   const serialized = cookie.serialize("token", token, {
-      //     httpOnly: true,
-      //   });
-      //   res.setHeader("Set-Cookie", serialized);
-
       res.status(201).json({
         success: true,
-        data: { userId: newUser.id, email: newUser.email, token },
+        data: {
+          userData: {
+            id: newUser.id,
+            email: newUser.email,
+          },
+          token,
+        },
       });
     } catch {
       const error = new Error("Error! Something went wrong.");
@@ -58,4 +49,42 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { signUp };
+const login = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res
+      .status(404)
+      .send({ message: "This user doesn't exist, please sign up!" });
+  }
+
+  const passwordsMatch = await bcrypt.compare(password, user!.password);
+
+  if (passwordsMatch) {
+    try {
+      let token = jwt.sign({ user }, SECRET_KEY as string, {
+        expiresIn: "1h",
+      });
+
+      res.status(201).json({
+        success: true,
+        data: {
+          userData: {
+            id: user?._id,
+            email: user?.email,
+          },
+          token,
+        },
+      });
+    } catch {
+      const error = new Error("Error! Something went wrong.");
+      return next(error);
+    }
+  } else {
+    res.status(400).send({ message: "Password is incorrect" });
+  }
+};
+
+export { signUp, login };

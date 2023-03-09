@@ -2,7 +2,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Note from "../components/Note";
-import Spinner from "../components/Spinner";
+import Spinner from "../components/Loaders/Spinner";
+import Skeleton from "../components/Loaders/Skeleton";
 
 export type NoteType = {
   _id?: string;
@@ -38,12 +39,13 @@ export default function Home() {
     return (
       <div className="flex justify-center items-center">
         <Spinner />
+        {/* <Skeleton /> */}
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 flex-grow">
+    <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 flex-grow mb-8">
       <h1 className="my-8 text-xl text-center gray-800 p-4 bg-yellow-200 border border-yellow-300 shadow-sm rounded-sm">
         Good morning, start your day by creating a new note!
       </h1>
