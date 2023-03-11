@@ -1,5 +1,5 @@
 import { timeStamp } from "console";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const noteSchema = new mongoose.Schema(
   {
@@ -15,6 +15,7 @@ const noteSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    user: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );

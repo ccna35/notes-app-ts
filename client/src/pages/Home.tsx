@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Note from "../components/Note";
 import Spinner from "../components/Loaders/Spinner";
 import Skeleton from "../components/Loaders/Skeleton";
+import DeletionModal from "../components/Modals/DeletionModal";
 
 export type NoteType = {
   _id?: string;
@@ -16,9 +17,14 @@ export type NoteType = {
 };
 
 export default function Home() {
+  const id: string = JSON.parse(localStorage.getItem("userData")!).id;
+
   const getNotes = async (): Promise<NoteType[]> => {
     try {
-      const response = await axios.get("http://localhost:3000/notes/getAll");
+      const response = await axios.get(
+        `http://localhost:3000/notes/getAll/${id}`
+      );
+      console.log(response.data);
       return response.data;
     } catch (error: any) {
       console.error(error);
@@ -47,10 +53,11 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 flex-grow mb-8">
       <h1 className="my-8 text-xl text-center gray-800 p-4 bg-yellow-200 border border-yellow-300 shadow-sm rounded-sm">
-        Good morning, start your day by creating a new note!
+        Hey {JSON.parse(localStorage.getItem("userData")!).firstName}, start
+        your day by creating a new note!
       </h1>
       {data?.length === 0 ? (
-        <div className="text-2xl text-center flex gap-4 items-center justify-center">
+        <div className="text-2xl text-center flex gap-4 items-center justify-center flex-wrap">
           <p>Oops! looks like you haven't created any notes yet.</p>
           <img
             src="../sad-but-relieved-face-svgrepo-com.svg"

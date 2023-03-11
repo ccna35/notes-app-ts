@@ -41,7 +41,6 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     success: true,
     data: {
       userId: existingUser.id,
-      email: existingUser.email,
       token: token,
     },
   });

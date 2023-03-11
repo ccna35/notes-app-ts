@@ -2,10 +2,11 @@ import { Request, Response } from "express";
 import Note from "../models/noteModel";
 
 const createNote = async (req: Request, res: Response) => {
-  const { title, text } = req.body;
+  const { title, text, userId } = req.body;
   const note = new Note({
     title,
     text,
+    user: userId,
   });
 
   try {
@@ -17,8 +18,10 @@ const createNote = async (req: Request, res: Response) => {
 };
 
 const getAllNotes = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
   try {
-    res.send(await Note.find().sort({ createdAt: -1 }));
+    res.send(await Note.find({ user: id }).sort({ createdAt: -1 }));
   } catch (error) {
     console.log(error);
   }

@@ -26,7 +26,8 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
       await newUser.save();
-      let token = jwt.sign({ newUser }, SECRET_KEY as string, {
+      const userId = newUser._id;
+      let token = jwt.sign({ userId }, SECRET_KEY as string, {
         expiresIn: "1h",
       });
 
@@ -34,8 +35,10 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
         success: true,
         data: {
           userData: {
-            id: newUser.id,
-            email: newUser.email,
+            id: newUser?._id,
+            email: newUser?.email,
+            firstName: newUser?.firstName,
+            lastName: newUser?.lastName,
           },
           token,
         },
@@ -64,7 +67,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
   if (passwordsMatch) {
     try {
-      let token = jwt.sign({ user }, SECRET_KEY as string, {
+      const userId = user?._id;
+      let token = jwt.sign({ userId }, SECRET_KEY as string, {
         expiresIn: "1h",
       });
 
@@ -74,6 +78,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
           userData: {
             id: user?._id,
             email: user?.email,
+            firstName: user?.firstName,
+            lastName: user?.lastName,
           },
           token,
         },

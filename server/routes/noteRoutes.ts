@@ -11,7 +11,7 @@ const router = Router();
 router.post("/new", createNote);
 
 //Get all Method
-router.get("/getAll", getAllNotes);
+router.get("/getAll/:id", getAllNotes);
 
 //Get by ID Method
 router.get("/getOne/:id", (req: Request, res: Response) => {

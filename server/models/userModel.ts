@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    profilePhoto: String,
   },
   { timestamps: { createdAt: "created_at" } }
 );
